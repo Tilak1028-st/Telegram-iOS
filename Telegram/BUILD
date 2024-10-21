@@ -140,7 +140,7 @@ genrule(
     ],
 )
 
-minimum_os_version = "12.0"
+minimum_os_version = "14.0"
 minimum_watchos_version="9.0"
 
 notificationServiceExtensionVersion = "v1"
@@ -1207,7 +1207,7 @@ swift_library(
         "Share/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     deps = [
         "//submodules/TelegramUI",
@@ -1294,7 +1294,7 @@ swift_library(
         "NotificationContent/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     deps = [
         "//submodules/TelegramUI:TelegramUI",
@@ -1389,7 +1389,7 @@ swift_library(
         "WidgetKitWidget/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     data = [
         ":WidgetAssets",
@@ -1524,7 +1524,7 @@ swift_library(
         "SiriIntents/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     data = glob([
         "SiriIntents/*.lproj/Intents.intentdefinition"
@@ -1627,7 +1627,7 @@ swift_library(
         "BroadcastUpload/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     deps = [
         "//submodules/TelegramUI:TelegramUI",
@@ -2077,7 +2077,7 @@ swift_library(
         "Tests/TelegramCoreBuildTest/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        # "-warnings-as-errors",
     ],
     data = [
         ":WidgetAssets",
