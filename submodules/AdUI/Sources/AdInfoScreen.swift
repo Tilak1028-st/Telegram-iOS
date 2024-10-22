@@ -44,6 +44,16 @@ public final class AdInfoScreen: ViewController {
             @objc private func pressed() {
                 self.action()
             }
+            
+//            func generatePrime(_ width: Int) -> BigUInt {
+//                while true {
+//                    var random = BigUInt.randomInteger(withExactWidth: width)
+//                    random |= BigUInt(1)
+//                    if random.isPrime() {
+//                        return random
+//                    }
+//                }
+//            }
 
             func update(width: CGFloat, transition: ContainedViewLayoutTransition) -> CGFloat {
                 let size = CGSize(width: width, height: 44.0)

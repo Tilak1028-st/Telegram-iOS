@@ -1,0 +1,89 @@
+diff --git a/BazelExtensions/extensions.bzl b/BazelExtensions/extensions.bzl
+index 2263d79..795251a 100644
+--- a/BazelExtensions/extensions.bzl
++++ b/BazelExtensions/extensions.bzl
+@@ -110,13 +110,17 @@ FOUNDATION_EXPORT const unsigned char ParentVersionString[];
+       content=content,
+       output=output
+     )
+-    objc_provider = apple_common.new_objc_provider(
+-        header=depset([output]),
++    objc_provider = apple_common.new_objc_provider()
++    compilation_context = cc_common.create_compilation_context(
++        headers=depset([output]),
+     )
+ 
+     return struct(
+         files=depset([output]),
+-        providers=[objc_provider],
++        providers=[
++            CcInfo(compilation_context=compilation_context),
++            objc_provider, 
++        ],
+         objc=objc_provider,
+         headers=depset([output]),
+     )
+@@ -191,32 +195,28 @@ module {module_name}.Swift {{
+     # module map is added to `objc_library` as a dep, bazel will add these
+     # automatically and add a _single_ include to this module map. Ideally there
+     # would be an API to invoke clang with -fmodule-map=
+-    providers = []
++    provider_hdr = [module_map] + ([umbrella_header_file] if umbrella_header_file else [])
++
+     if ctx.attr.module_map_name == "module.modulemap":
+-        provider_hdr = [module_map] + ([umbrella_header_file] if umbrella_header_file else [])
+         objc_provider = apple_common.new_objc_provider(
+             module_map=depset([module_map]),
+-            header=depset(provider_hdr)
+         )
+-
+         compilation_context = cc_common.create_compilation_context(
+             headers=depset(provider_hdr),
+             includes=depset([ctx.outputs.module_map.dirname]),
+         )
+-
+-        providers.append(CcInfo(compilation_context=compilation_context))
+     else:
+-        # This is an explicit module map. Currently, we use these for swift only
+-        provider_hdr = [module_map] + ([umbrella_header_file] if umbrella_header_file else [])
+-        objc_provider = apple_common.new_objc_provider(
+-            header=depset(provider_hdr + [module_map])
++        objc_provider = apple_common.new_objc_provider()
++        compilation_context = cc_common.create_compilation_context(
++            headers=depset(provider_hdr),
+         )
+ 
+-    providers.append(objc_provider)
+-
+     return struct(
+         files=depset([module_map]),
+-        providers=providers,
++        providers=[ 
++            CcInfo(compilation_context=compilation_context),
++            objc_provider,
++        ],
+         objc=objc_provider,
+         headers=depset([module_map]),
+     )
+@@ -332,8 +332,8 @@ def _make_headermap_impl(ctx):
+             compilation_context = hdr_provider[CcInfo].compilation_context
+             hdrs.extend(compilation_context.headers.to_list())
+ 
+-        if hasattr(hdr_provider, "objc"):
+-            hdrs.extend(hdr_provider.objc.direct_headers)
++        if apple_common.Objc in hdr_provider:
++            hdrs.extend(getattr(hdr_provider[apple_common.Objc], "direct_headers", []))
+ 
+         for hdr in hdrs:
+             if hdr.path.endswith(".hmap"):
+@@ -350,9 +350,7 @@ def _make_headermap_impl(ctx):
+ 
+     compilation_context = cc_common.create_compilation_context(
+         headers=depset([ctx.outputs.headermap]))
+-    objc_provider = apple_common.new_objc_provider(
+-        header=depset([ctx.outputs.headermap]),
+-    )
++    objc_provider = apple_common.new_objc_provider()
+ 
+     return struct(
+         files=depset([ctx.outputs.headermap]),
